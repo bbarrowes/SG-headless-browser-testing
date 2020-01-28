@@ -50,6 +50,44 @@ class CustomPage {
                 return el.innerHTML;
             });
         }
+    // Automate get requests for tests
+        get(path){
+            return this.page.evaluate( (path2)=>{
+                    return fetch(path2,{
+                        method: 'GET',
+                        credentials: 'same-origin',
+                        headers:{
+                            'Content-Type':'application/json'
+                        }
+                    }).then(res => res.json() );
+                },
+                path
+            );
+        }
+    // Posts
+        post( path, data ){
+            return this.page.evaluate( ( path2 , data2 )=>{
+                return fetch( path2 , {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers:{
+                        'Content-Type':'application/json'
+                    },
+                    data: JSON.stringify( data2 )
+                }).then( res => res.json() );
+            },
+            path,
+            data
+            );
+        }
+    // Execute array of actions
+        execRequests(actions){
+            return Promise.all(
+                actions.map( ( {method,path,data} )=>{
+                    return this[method](path,data);
+                })
+            );
+        }
 }
 
 module.exports = CustomPage;
